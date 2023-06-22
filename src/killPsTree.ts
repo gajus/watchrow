@@ -11,9 +11,17 @@ export const killPsTree = async (
   rootPid: number,
   gracefulTimeout: number = 30_000,
 ) => {
-  const childPids = await pidTree(rootPid);
+  let pids: number[] = [];
 
-  const pids = [rootPid, ...childPids];
+  try {
+    pids = await pidTree(rootPid, {
+      root: true,
+    });
+  } catch (error) {
+    log.warn({ error }, 'failed to find process tree');
+
+    return false;
+  }
 
   for (const pid of pids) {
     try {
@@ -65,4 +73,6 @@ export const killPsTree = async (
   clearTimeout(timeoutId);
 
   log.debug('all processes terminated');
+
+  return true;
 };

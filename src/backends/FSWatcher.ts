@@ -67,6 +67,10 @@ export class FSWatcher extends FileWatchingBackend {
           recursive: true,
         },
         (eventType, filename) => {
+          if (filename === null) {
+            return;
+          }
+
           this.emitChange({ filename: path.resolve(target, filename) });
         },
       );
@@ -91,6 +95,10 @@ export class FSWatcher extends FileWatchingBackend {
               recursive: true,
             },
             (eventType, filename) => {
+              if (filename === null) {
+                return;
+              }
+
               const absolutePath = path.resolve(symlink.realpath, filename);
 
               this.emitChange({

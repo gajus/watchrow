@@ -21,8 +21,6 @@ jobs:
   test:
     environment: release
     name: Test
-    needs:
-      - lint
     runs-on: ${{ matrix.os }}
     steps:
       - name: setup repository
@@ -43,6 +41,8 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - macos-latest
+          - windows-latest
         version:
           - 18
           - 19

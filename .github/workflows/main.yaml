@@ -1,7 +1,6 @@
 jobs:
-  test:
-    environment: release
-    name: Test
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: setup repository
@@ -17,9 +16,53 @@ jobs:
       - run: npm run lint:eslint
       - run: npm run lint:tsc
       - run: npm run lint:cspell
+    timeout-minutes: 10
+  test:
+    environment: release
+    name: Test
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: setup repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: setup node.js
+        uses: actions/setup-node@v2
+        with:
+          cache: 'npm'
+          node-version: '19'
+      - run: npm ci
       - env:
           ROARR_LOG: 'true'
         run: npm run test:vitest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        version:
+          - 18
+          - 19
+    timeout-minutes: 10
+  release:
+    environment: release
+    name: Release
+    needs:
+      - lint
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: setup node.js
+        uses: actions/setup-node@v2
+        with:
+          cache: 'npm'
+          node-version: '19'
+      - run: npm ci
       - run: npm run build
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
