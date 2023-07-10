@@ -6,6 +6,7 @@ import { killPsTree } from './killPsTree';
 import { Logger } from './Logger';
 import { type Throttle } from './types';
 import chalk from 'chalk';
+import { execSync } from 'node:child_process';
 import randomColor from 'randomcolor';
 import { throttle } from 'throttle-debounce';
 import { $ } from 'zx';
@@ -22,6 +23,15 @@ const prefixLines = (subject: string, prefix: string): string => {
   }
 
   return response.join('\n');
+};
+
+const hasPowershell = () => {
+  try {
+    execSync('powershell.exe echo .');
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export const createSpawn = (
@@ -71,7 +81,12 @@ export const createSpawn = (
 
     $.cwd = cwd;
 
-    $.prefix = `set -euo pipefail; export PATH="${binPath}:$PATH";`;
+    if (process.platform === 'win32' && hasPowershell()) {
+      $.shell = 'powershell.exe';
+      $.prefix = `$env:PATH+="${binPath}";`;
+    } else {
+      $.prefix = `set -euo pipefail; export PATH="${binPath}:$PATH";`;
+    }
 
     let onStdout: (chunk: Buffer) => void;
     let onStderr: (chunk: Buffer) => void;
