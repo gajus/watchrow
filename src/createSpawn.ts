@@ -30,10 +30,14 @@ export const createSpawn = (
     cwd = process.cwd(),
     abortSignal,
     throttleOutput,
+    triggerName,
+    triggerHexColor,
   }: {
     abortSignal?: AbortSignal;
     cwd?: string;
     throttleOutput?: Throttle;
+    triggerHexColor?: string;
+    triggerName?: string;
   } = {},
 ) => {
   let stdoutBuffer: string[] = [];
@@ -64,7 +68,9 @@ export const createSpawn = (
     },
   );
 
-  const colorText = chalk.hex(randomColor({ luminosity: 'dark' }));
+  const colorText = chalk.hex(
+    triggerHexColor || randomColor({ luminosity: 'dark' }),
+  );
 
   return async (pieces: TemplateStringsArray, ...args: any[]) => {
     const binPath = (await findNearestDirectory('node_modules', cwd)) + '/.bin';
@@ -77,7 +83,12 @@ export const createSpawn = (
     let onStderr: (chunk: Buffer) => void;
 
     const formatChunk = (chunk: Buffer) => {
-      return prefixLines(chunk.toString().trimEnd(), colorText(taskId) + ' > ');
+      const prefixTriggerName = triggerName ? triggerName + ' ' : '';
+
+      return prefixLines(
+        chunk.toString().trimEnd(),
+        colorText(`${prefixTriggerName}${taskId}`) + ' > ',
+      );
     };
 
     if (throttleOutput?.delay) {

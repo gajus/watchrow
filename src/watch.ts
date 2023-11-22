@@ -101,6 +101,7 @@ export const watch = (
         abortSignal,
         cwd,
         expression: trigger.expression,
+        hexColor: trigger.hexColor,
         id: generateShortId(),
         initialRun,
         interruptible: trigger.interruptible ?? true,

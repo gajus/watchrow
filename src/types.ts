@@ -100,11 +100,13 @@ export type Throttle = {
  * @property interruptible Sends abort signal to an ongoing routine, if any. Otherwise, waits for routine to finish. (default: true)
  * @property initialRun Indicates whether onChange is run when the script is first initiated.
  * @property name Name of the trigger. Used for debugging. Must match /^[a-z0-9-_]+$/ pattern and must be unique.
+ * @property hexColor Hex color code used for logging.
  * @property onChange Routine that is executed when file changes are detected.
  * @property persistent Label a task as persistent if it is a long-running process, such as a dev server or --watch mode.
  */
 export type TriggerInput = {
   expression: Expression;
+  hexColor?: string;
   initialRun?: boolean;
   interruptible?: boolean;
   name: string;
@@ -119,6 +121,7 @@ export type Trigger = {
   abortSignal: AbortSignal;
   cwd?: string;
   expression: Expression;
+  hexColor?: string;
   id: string;
   initialRun: boolean;
   interruptible: boolean;
